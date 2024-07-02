@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+
+{% block head %}
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/index.css')}}">
+{% endblock head %}
+
+{% block body %}
+  <p>This is the index page...</p>
+  <form id="textForm">
+    <input type="text" id="textInput" placeholder="Enter text length (5-40)"/>
+    <button type="submit">Submit</button>
+  </form>
+  <p id="temporary-text"></p>
+  <script src="{{ url_for('static', filename='js/index.js') }}"></script>
+{% endblock body %}
