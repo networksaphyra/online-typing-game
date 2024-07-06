@@ -1,44 +1,55 @@
-function getTextFromBackend(text_length) {
-  fetch("http://localhost:10001/ss", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json"
-    },
-    body: JSON.stringify({ length: text_length })
-  })
-  .then(response => response.json())
-  .then(data => {
-    console.log("Generated Text:", data.generated_text); 
-    displayText(data.generated_text); 
-  })
-  .catch(error => {
-    console.error("Could not get your data, maybe the backend is down:", error);
-    displayText("Could not get your data, maybe the backend is down.");
-  });
-}
+import { getTextFromBackend } from "./requests.js"
 
-let textField = document.getElementById("temporary-text");
-let textForm = document.getElementById("textForm");
+document.addEventListener("DOMContentLoaded", function() {
+  let newTextButton = document.getElementById("new-text-button");
+  let typingText = document.getElementById("text-to-type");
+  let currentText = "";
+  let currentPosition = 0;
 
-function displayText(text) {
-  textField.textContent = text;
-}
+  newTextButton.addEventListener("click", displayNewText);
 
-textForm.addEventListener("submit", function(event) {
-  event.preventDefault(); 
+  async function displayNewText() {
+    const backendText = await getTextFromBackend(10);
+    currentText = backendText;
+    currentPosition = 0;
+    
+    typingText.innerHTML = ''; 
+    
+    backendText.split('').forEach((char, index) => {
+      let span = document.createElement('span');
+      span.textContent = char;
+      span.id = `char-${index}`;
+      typingText.appendChild(span);
+    });
 
-  let inputField = document.getElementById("textInput");
-  let textLength = 0;
-
-  try {
-    textLength = parseInt(inputField.value);
-    if (isNaN(textLength) || textLength < 5 || textLength > 40) {
-      throw new Error("Input value must be an integer between 5 and 40"); 
-    }
-  } catch (error) {
-    displayText(error.message);
-    return;
+    typingText.focus();
   }
 
-  getTextFromBackend(textLength);
+  typingText.addEventListener("keydown", evaluateKey);
+
+  function evaluateKey(event) {
+    event.preventDefault();
+
+    let key = event.key;
+
+    if (key === "Backspace") {
+      if (currentPosition > 0) {
+        currentPosition--;
+        updateCharColor(currentPosition, '');
+      }
+    } else if (key.length === 1) { 
+      if (currentPosition < currentText.length) {
+        let isCorrect = key === currentText[currentPosition];
+        updateCharColor(currentPosition, isCorrect ? 'green' : 'red');
+        currentPosition++;
+      }
+    }
+  }
+
+  function updateCharColor(position, color) {
+    let charSpan = document.getElementById(`char-${position}`);
+    if (charSpan) {
+      charSpan.style.color = color;
+    }
+  }
 });
