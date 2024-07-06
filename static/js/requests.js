@@ -11,9 +11,9 @@ export async function getTextFromBackend(text_length) {
   };
 
   try {
-    const response = await fetch(global, options);
+    const response = await fetch(local, options);
     const data = await response.json();
-    return data.text;
+    return await data.text;
 
   } catch (error) {
     console.log("Error", error);

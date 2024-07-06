@@ -7,6 +7,6 @@
 {% block body %}
   <h1>Welcome to Online-Typing-Game</h1>
   <button id="new-text-button">New Text</button>
-  <div id="text-to-type" contenteditable="true"></div>
+  <div id="input-container" spellcheck="false" contenteditable="true"></div>
   <script type="module" src="{{ url_for('static', filename='js/index.js') }}"></script>
 {% endblock body %}
